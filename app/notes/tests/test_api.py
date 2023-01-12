@@ -121,3 +121,40 @@ def test_delete_notes(db, django_user_model):
 
     assert len(response.json()) == 1
     assert response.json()[0]['id'] == 2
+
+
+def test_api_filter_by_tag(db, django_user_model):
+    owner = django_user_model.objects.create(**AUTH_KWARGS)
+
+    test_client = APIClient()
+    test_client.force_authenticate(user=owner)
+
+    # TODO: use factory_boy to create multiple test objects for easier testing
+    Tag.objects.create(name="name")
+    tag1 = Tag.objects.get(id=1)
+    Tag.objects.create(name="name2")
+    tag2 = Tag.objects.get(id=2)
+
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
+    note_1 = Note.objects.get(id=1)
+    note_1.tags.add(tag1)
+    note_1.save()
+    Note.objects.create(title="note_title2", body="note_body2", owner=owner)
+    note_2 = Note.objects.get(id=2)
+    note_2.tags.add(tag2)
+    note_2.save()
+
+    expected = [
+        {
+            'id': 2,
+            'title': 'note_title2',
+            'body': 'note_body2',
+            'tags': [{'id': 2, 'name': 'name2'}],
+            'owner': 'someone',
+        }
+    ]
+    url = f"{NOTES_URL}?tag=name2"
+
+    response = test_client.get(url)
+
+    assert response.json() == expected
