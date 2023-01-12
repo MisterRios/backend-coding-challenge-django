@@ -10,12 +10,15 @@ def get_note_url(id):
     return reverse("note", kwargs={"pk": id})
 
 
+AUTH_KWARGS = {"username": "someone", "password": "something"}
+
+
 def test_api_list_notes(db, django_user_model):
+    owner = django_user_model.objects.create(**AUTH_KWARGS)
     # TODO: use fixtures to create test client instead of
     # instantiating over and over
     test_client = APIClient()
-
-    owner = django_user_model.objects.create(username="someone", password="something")
+    test_client.force_authenticate(user=owner)
 
     # TODO: use factory_boy to create multiple test objects for easier testing
     Tag.objects.create(name="name")
@@ -40,22 +43,25 @@ def test_api_list_notes(db, django_user_model):
             'title': 'note_title',
             'body': 'note_body',
             'tags': [{'id': 1, 'name': 'name'}],
-            'owner': {'id': 1, 'username': 'someone'},
+            'owner': 'someone',
         },
         {
             'id': 2,
             'title': 'note_title2',
             'body': 'note_body2',
             'tags': [{'id': 2, 'name': 'name2'}],
-            'owner': {'id': 1, 'username': 'someone'},
+            'owner': 'someone',
         },
     ]
 
 
-def test_create_notes(db):
+def test_create_notes(db, django_user_model):
+    owner = django_user_model.objects.create(**AUTH_KWARGS)
     # TODO: test with tags included in create notes payload
     test_client = APIClient()
-    payload = {'title': 'note_title', 'body': 'note_body', 'tags': []}
+    test_client.force_authenticate(user=owner)
+
+    payload = {'title': 'note_title', 'body': 'note_body', 'tags': [], "owner": owner.id}
 
     test_client.post(NOTES_URL, payload)
 
@@ -67,14 +73,16 @@ def test_create_notes(db):
             'title': 'note_title',
             'body': 'note_body',
             'tags': [],
+            'owner': 'someone',
         }
     ]
 
 
 def test_delete_notes(db, django_user_model):
-    owner = django_user_model.objects.create(username="someone", password="something")
+    owner = django_user_model.objects.create(**AUTH_KWARGS)
 
     test_client = APIClient()
+    test_client.force_authenticate(user=owner)
 
     # TODO: use factory_boy to create multiple test objects for easier testing
     Tag.objects.create(name="name")
