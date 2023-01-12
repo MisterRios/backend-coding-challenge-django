@@ -1,11 +1,6 @@
 import pytest
 
-from .models import Note
-
-
-@pytest.mark.fixture
-def test_note(db):
-    return Note.objects.create(title="note_title", body="note_body")
+from .models import Note, Tag
 
 
 def test_create_note(db):
@@ -51,3 +46,39 @@ def test_modify_note(db):
 
     assert note.title == "new_title"
     assert note.body == "new_body"
+
+
+def test_create_tag(db):
+    Tag.objects.create(name="test_name")
+
+    tags = Tag.objects.all()
+    assert len(tags) == 1
+
+    tag = Tag.objects.first()
+
+    assert tag.name == "test_name"
+
+
+def test_delete_tag(db):
+    Tag.objects.create(name="test_name")
+
+    tags = Tag.objects.all()
+    assert len(tags) == 1
+
+    tag = Tag.objects.get()
+    tag.delete()
+
+    notes = Tag.objects.all()
+    assert len(notes) == 0
+
+
+def test_modify_tag(db):
+    Tag.objects.create(name="test_name")
+
+    tag = Tag.objects.get()
+
+    tag.name = "new_name"
+    tag.save()
+    tag.refresh_from_db()
+
+    assert tag.name == "new_name"
