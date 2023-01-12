@@ -14,8 +14,12 @@ class NoteList(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
     def get_queryset(self):
-
         queryset = Note.objects.all()
+        user = self.request.user
+
+        if self.request.user.is_authenticated:
+            queryset = queryset.filter(owner=user)
+
         if tag_name := self.request.query_params.get('tag'):
             queryset = queryset.filter(tags__name=tag_name)
 
@@ -23,9 +27,17 @@ class NoteList(generics.ListCreateAPIView):
 
 
 class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Note.objects.all()
+        user = self.request.user
+
+        if self.request.user.is_authenticated:
+            queryset.filter(owner=user)
+
+        return queryset
 
 
 class TagList(generics.ListCreateAPIView):
