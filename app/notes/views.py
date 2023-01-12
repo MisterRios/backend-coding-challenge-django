@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics, permissions
 
 from .models import Note, Tag
@@ -19,6 +20,12 @@ class NoteList(generics.ListCreateAPIView):
 
         if self.request.user.is_authenticated:
             queryset = queryset.filter(owner=user)
+
+        # basic text search on note title and body
+        if search_param := self.request.query_params.get('search'):
+            queryset = queryset.filter(
+                Q(title__icontains=search_param) | Q(body__icontains=search_param)
+            )
 
         if tag_name := self.request.query_params.get('tag'):
             queryset = queryset.filter(tags__name=tag_name)
