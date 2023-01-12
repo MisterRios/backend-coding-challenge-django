@@ -21,7 +21,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
-    owner = UserSerializer()
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Note
