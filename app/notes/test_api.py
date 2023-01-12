@@ -17,8 +17,6 @@ def test_api_list_notes(db, django_user_model):
     owner = django_user_model.objects.create(**AUTH_KWARGS)
     # TODO: use fixtures to create test client instead of
     # instantiating over and over
-    test_client = APIClient()
-    test_client.force_authenticate(user=owner)
 
     # TODO: use factory_boy to create multiple test objects for easier testing
     Tag.objects.create(name="name")
@@ -35,9 +33,8 @@ def test_api_list_notes(db, django_user_model):
     note_2.tags.add(tag2)
     note_2.save()
 
-    response = test_client.get(NOTES_URL)
-
-    assert response.json() == [
+    test_client = APIClient()
+    expected = [
         {
             'id': 1,
             'title': 'note_title',
@@ -53,6 +50,17 @@ def test_api_list_notes(db, django_user_model):
             'owner': 'someone',
         },
     ]
+
+    # test without authentication
+    response = test_client.get(NOTES_URL)
+
+    assert response.json() == expected
+
+    # test with authentication
+    test_client.force_authenticate(user=owner)
+    response = test_client.get(NOTES_URL)
+
+    assert response.json() == expected
 
 
 def test_create_notes(db, django_user_model):
