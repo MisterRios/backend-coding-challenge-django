@@ -5,6 +5,8 @@ from .serializers import NoteSerializer, TagSerializer
 
 
 class NoteList(generics.ListCreateAPIView):
+    # TODO: Add filtering against tags here
+    # See: https://www.django-rest-framework.org/api-guide/filtering/#filtering-against-query-parameters # noqa: E501
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
