@@ -147,8 +147,8 @@ def test_api_filter_by_tag(db, django_user_model):
     expected = [
         {
             'id': 2,
-            'title': 'note_title',
-            'body': 'note_body',
+            'title': 'note_title2',
+            'body': 'note_body2',
             'tags': [{'id': 2, 'name': 'name2'}],
             'owner': 'someone',
         }
