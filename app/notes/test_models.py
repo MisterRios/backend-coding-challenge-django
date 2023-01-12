@@ -1,8 +1,14 @@
+import pytest
+
 from .models import Note, Tag
 
 
-def test_create_note(db):
-    Note.objects.create(title="note_title", body="note_body")
+@pytest.mark.fixture
+def test_create_note(db, django_user_model):
+    # TODO: create fixture for user to not have to instantiate
+    owner = django_user_model.objects.create(username="someone", password="something")
+
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
 
     notes = Note.objects.all()
     assert len(notes) == 1
@@ -13,8 +19,9 @@ def test_create_note(db):
     assert note.body == "note_body"
 
 
-def test_delete_note(db):
-    Note.objects.create(title="note_title", body="note_body")
+def test_delete_note(db, django_user_model):
+    owner = django_user_model.objects.create(username="someone", password="something")
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
 
     notes = Note.objects.all()
     assert len(notes) == 1
@@ -26,8 +33,9 @@ def test_delete_note(db):
     assert len(notes) == 0
 
 
-def test_modify_note(db):
-    Note.objects.create(title="note_title", body="note_body")
+def test_modify_note(db, django_user_model):
+    owner = django_user_model.objects.create(username="someone", password="something")
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
 
     notes = Note.objects.all()
     assert len(notes) == 1
@@ -82,8 +90,9 @@ def test_modify_tag(db):
     assert tag.name == "new_name"
 
 
-def test_add_tag_to_note(db):
-    Note.objects.create(title="note_title", body="note_body")
+def test_add_tag_to_note(db, django_user_model):
+    owner = django_user_model.objects.create(username="someone", password="something")
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
     Tag.objects.create(name="test_name")
 
     note = Note.objects.get()
@@ -99,8 +108,9 @@ def test_add_tag_to_note(db):
     assert note.tags.get() == tag
 
 
-def test_delete_tag_from_note(db):
-    Note.objects.create(title="note_title", body="note_body")
+def test_delete_tag_from_note(db, django_user_model):
+    owner = django_user_model.objects.create(username="someone", password="something")
+    Note.objects.create(title="note_title", body="note_body", owner=owner)
     Tag.objects.create(name="test_name")
 
     note = Note.objects.get()
