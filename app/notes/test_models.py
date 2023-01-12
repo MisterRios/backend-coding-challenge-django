@@ -82,3 +82,37 @@ def test_modify_tag(db):
     tag.refresh_from_db()
 
     assert tag.name == "new_name"
+
+
+def test_add_tag_to_note(db):
+    Note.objects.create(title="note_title", body="note_body")
+    Tag.objects.create(name="test_name")
+
+    note = Note.objects.get()
+    tag = Tag.objects.get()
+
+    note.tags.add(tag)
+    note.save()
+
+    assert len(note.tags.all()) == 1
+
+    note.refresh_from_db()
+
+    assert note.tags.get() == tag
+
+
+def test_delete_tag_from_note(db):
+    Note.objects.create(title="note_title", body="note_body")
+    Tag.objects.create(name="test_name")
+
+    note = Note.objects.get()
+    tag = Tag.objects.get()
+
+    note.tags.add(tag)
+    note.save()
+
+    note.tags.remove(tag)
+    note.save()
+    note.refresh_from_db()
+
+    assert len(note.tags.all()) == 0
