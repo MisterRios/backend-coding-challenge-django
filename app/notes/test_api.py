@@ -11,7 +11,8 @@ def get_note_url(id):
 
 
 def test_api_list_notes(db):
-    # TODO: use fixtures to create test client instead of instantiating over and over
+    # TODO: use fixtures to create test client instead of
+    # instantiating over and over
     test_client = APIClient()
     # TODO: use factory_boy to create multiple test objects for easier testing
     Tag.objects.create(name="name")
@@ -47,11 +48,11 @@ def test_api_list_notes(db):
 
 
 def test_create_notes(db):
-    # TODO: test with tags included in create notes payload- like DRF backend view does
+    # TODO: test with tags included in create notes payload
     test_client = APIClient()
     payload = {'title': 'note_title', 'body': 'note_body', 'tags': []}
 
-    post_response = test_client.post(NOTES_URL, payload)
+    test_client.post(NOTES_URL, payload)
 
     response = test_client.get(NOTES_URL)
 
