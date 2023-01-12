@@ -1,6 +1,5 @@
 import pytest
-
-from .models import Note, Tag
+from notes.models import Note, Tag
 
 
 @pytest.mark.fixture
