@@ -4,6 +4,8 @@ from django.db import models
 class Note(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField()
+    tags = models.ManyToManyField('Tag', blank=True)
+
     created_date = models.DateTimeField(auto_now_add=True)
     modifield_date = models.DateTimeField(auto_now=True)
 
@@ -13,7 +15,6 @@ class Note(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
-    notes = models.ManyToManyField(Note)
 
     def __str__(self):
         return self.name
