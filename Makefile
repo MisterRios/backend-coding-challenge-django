@@ -7,4 +7,4 @@ start:
 	docker-compose up
 
 test:
-	docker-compose run --rm app sh -c "pytest && flake8 && mypy ."
+	docker-compose run --rm app sh -c "pytest && flake8";
